@@ -69,6 +69,11 @@ spring:
           predicates:
             - Path=/v1/notificaciones/**
 
+        - id: auth-service
+          uri: http://localhost:8092
+          predicates:
+            - Path=/v1/auth/**
+
 management:
   endpoints:
     web:
@@ -77,3 +82,7 @@ management:
   endpoint:
     gateway:
       enabled: true
+
+auth:
+  service:
+    url: http://localhost:8092
