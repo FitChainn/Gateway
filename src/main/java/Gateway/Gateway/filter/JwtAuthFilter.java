@@ -12,6 +12,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -50,15 +51,19 @@ public class JwtAuthFilter implements GlobalFilter {
             return exchange.getResponse().setComplete();
         }
 
-        // Validar el token con el Auth service
+        // Validar el token con el Auth service y extraer el rol
         return webClient.get()
                 .uri("/v1/auth/validar")
                 .header("Authorization", authHeader)
                 .retrieve()
-                .toBodilessEntity()
-                .flatMap(response -> {
-                    log.info("Token válido para: {}", path);
-                    return chain.filter(exchange);
+                .bodyToMono(Map.class)
+                .flatMap(body -> {
+                    String rol = (String) body.get("rol");
+                    log.info("Token válido, rol: {} para: {}", rol, path);
+                    ServerWebExchange mutatedExchange = exchange.mutate()
+                            .request(r -> r.header("X-User-Rol", rol != null ? rol : ""))
+                            .build();
+                    return chain.filter(mutatedExchange);
                 })
                 .onErrorResume(e -> {
                     log.warn("Token inválido para {}: {}", path, e.getMessage());
