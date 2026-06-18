@@ -38,7 +38,7 @@ public class JwtAuthFilter implements GlobalFilter {
 
         // Si es ruta pública, deja pasar sin validar
         if (RUTAS_PUBLICAS.stream().anyMatch(path::startsWith)) {
-            log.info("Ruta pública, sin validación: {}", path);
+            log.info("RUTA PÚBLICA SIN VALIDACIÓN: {}", path);
             return chain.filter(exchange);
         }
 
@@ -46,7 +46,7 @@ public class JwtAuthFilter implements GlobalFilter {
         String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.warn("Petición sin token: {}", path);
+            log.warn("PETICIÓN SIN TOKEN: {}", path);
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
@@ -59,14 +59,14 @@ public class JwtAuthFilter implements GlobalFilter {
                 .bodyToMono(Map.class)
                 .flatMap(body -> {
                     String rol = (String) body.get("rol");
-                    log.info("Token válido, rol: {} para: {}", rol, path);
+                    log.info("TOKEN VÁLIDO, ROL: {} PARA RUTA: {}", rol, path);
                     ServerWebExchange mutatedExchange = exchange.mutate()
                             .request(r -> r.header("X-User-Rol", rol != null ? rol : ""))
                             .build();
                     return chain.filter(mutatedExchange);
                 })
                 .onErrorResume(e -> {
-                    log.warn("Token inválido para {}: {}", path, e.getMessage());
+                    log.warn("TOKEN INVÁLIDO PARA {}: {}", path, e.getMessage());
                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                     return exchange.getResponse().setComplete();
                 });
