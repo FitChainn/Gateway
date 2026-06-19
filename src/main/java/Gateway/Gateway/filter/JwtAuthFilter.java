@@ -25,7 +25,9 @@ public class JwtAuthFilter implements GlobalFilter {
     private static final List<String> RUTAS_PUBLICAS = List.of(
             "/v1/auth/login",
             "/v1/auth/register",
-            "/v1/auth/validar"
+            "/v1/auth/validar",
+            "/swagger-ui",
+            "/webjars"
     );
 
     public JwtAuthFilter(@Value("${auth.service.url}") String authUrl) {
@@ -36,8 +38,11 @@ public class JwtAuthFilter implements GlobalFilter {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
+        boolean esPublica = RUTAS_PUBLICAS.stream().anyMatch(path::startsWith)
+                || path.endsWith("/v3/api-docs");
+
         // Si es ruta pública, deja pasar sin validar
-        if (RUTAS_PUBLICAS.stream().anyMatch(path::startsWith)) {
+        if (esPublica) {
             log.info("RUTA PÚBLICA SIN VALIDACIÓN: {}", path);
             return chain.filter(exchange);
         }
