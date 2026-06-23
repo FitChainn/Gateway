@@ -33,7 +33,7 @@ spring:
         - id: entrenador-service
           uri: ${ENTRENADOR_SERVICE_URL:http://localhost:8082}
           predicates:
-            - Path=/api/entrenadores/**
+            - Path=/v1/entrenadores/**
         - id: entrenador-docs
           uri: ${ENTRENADOR_SERVICE_URL:http://localhost:8082}
           predicates:
