@@ -27,7 +27,8 @@ public class JwtAuthFilter implements GlobalFilter {
             "/v1/auth/register",
             "/v1/auth/validar",
             "/swagger-ui",
-            "/webjars"
+            "/webjars",
+            "/v3/api-docs"
     );
 
     public JwtAuthFilter(@Value("${auth.service.url}") String authUrl) {
@@ -39,7 +40,7 @@ public class JwtAuthFilter implements GlobalFilter {
         String path = exchange.getRequest().getURI().getPath();
 
         boolean esPublica = RUTAS_PUBLICAS.stream().anyMatch(path::startsWith)
-                || path.endsWith("/v3/api-docs");
+                || path.contains("/v3/api-docs");
 
         // Si es ruta pública, deja pasar sin validar
         if (esPublica) {

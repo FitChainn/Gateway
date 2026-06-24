@@ -154,7 +154,10 @@ auth:
     url: ${AUTH_SERVICE_URL:http://localhost:8092}
 
 springdoc:
+  api-docs:
+    enabled: true
   swagger-ui:
+    path: /swagger-ui.html
     urls:
       - name: Clientes
         url: /clientes/v3/api-docs
